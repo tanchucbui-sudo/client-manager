@@ -20,6 +20,15 @@ export default function ClientTable({
     onChanged();
   }
 
+  async function setStatus(clientId: number, trangThai: string) {
+    await fetch(`/api/clients/${clientId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ trang_thai: trangThai }),
+    });
+    onChanged();
+  }
+
   async function removeClient(clientId: number) {
     if (!confirm('Xóa client này?')) return;
     await fetch(`/api/clients/${clientId}`, { method: 'DELETE' });
@@ -44,15 +53,18 @@ export default function ClientTable({
               <td className="px-4 py-2 font-mono text-xs text-slate-500">{c.ma}</td>
               <td className="px-4 py-2">{c.ten_khach_hang}</td>
               <td className="px-4 py-2">
-                <span
-                  className={`inline-block px-2 py-0.5 rounded-full text-xs ${
+                <select
+                  className={`border rounded-full px-2 py-0.5 text-xs cursor-pointer ${
                     c.trang_thai === 'Active'
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-slate-200 text-slate-600'
+                      ? 'bg-green-100 text-green-700 border-green-200'
+                      : 'bg-slate-200 text-slate-600 border-slate-300'
                   }`}
+                  value={c.trang_thai}
+                  onChange={(e) => setStatus(c.id, e.target.value)}
                 >
-                  {c.trang_thai}
-                </span>
+                  <option value="Active">Active</option>
+                  <option value="Disable">Disable</option>
+                </select>
               </td>
               <td className="px-4 py-2">
                 <select
