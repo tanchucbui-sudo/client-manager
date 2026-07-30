@@ -41,6 +41,58 @@ export default function Page() {
     });
   }, [clients, search, buFilter]);
 
+  function downloadCsv() {
+    const headers = [
+      'Mã',
+      'Tên khách hàng',
+      'Tên đầy đủ theo GPKD',
+      'MST',
+      'Địa chỉ đăng ký',
+      'Người đại diện',
+      'Chức danh đại diện',
+      'Thông tin liên hệ',
+      'Trạng thái',
+      'BU',
+    ];
+
+    function escapeCsv(value: unknown) {
+      const s = value === null || value === undefined ? '' : String(value);
+      if (/[",\n]/.test(s)) {
+        return `"${s.replace(/"/g, '""')}"`;
+      }
+      return s;
+    }
+
+    const rows = filtered.map((c) => [
+      c.ma,
+      c.ten_khach_hang,
+      c.ten_day_du,
+      c.mst,
+      c.dia_chi,
+      c.nguoi_dai_dien,
+      c.chuc_danh,
+      c.lien_he,
+      c.trang_thai,
+      c.bu_name ?? '',
+    ]);
+
+    const csv = [headers, ...rows]
+      .map((row) => row.map(escapeCsv).join(','))
+      .join('\n');
+
+    // Prepend BOM so Vietnamese characters open correctly in Excel.
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const date = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `clients-${date}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <main className="max-w-6xl mx-auto px-4 py-8">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
@@ -51,6 +103,12 @@ export default function Page() {
           </p>
         </div>
         <div className="flex gap-2">
+          <button
+            onClick={downloadCsv}
+            className="px-3 py-2 text-sm rounded-md border hover:bg-slate-50"
+          >
+            Tải CSV
+          </button>
           <button
             onClick={() => setShowBu(true)}
             className="px-3 py-2 text-sm rounded-md border hover:bg-slate-50"

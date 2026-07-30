@@ -33,12 +33,6 @@ export default function ClientTable({
     onChanged();
   }
 
-  async function removeClient(clientId: number) {
-    if (!confirm('Xóa client này?')) return;
-    await fetch(`/api/clients/${clientId}`, { method: 'DELETE' });
-    onChanged();
-  }
-
   return (
     <div className="overflow-x-auto border rounded-xl bg-white">
       <table className="min-w-full text-sm">
@@ -87,15 +81,9 @@ export default function ClientTable({
               <td className="px-4 py-2 text-right whitespace-nowrap">
                 <button
                   onClick={() => setEditing(c)}
-                  className="text-slate-600 hover:text-slate-900 text-xs mr-3"
+                  className="text-slate-600 hover:text-slate-900 text-xs"
                 >
                   Sửa
-                </button>
-                <button
-                  onClick={() => removeClient(c.id)}
-                  className="text-red-500 hover:text-red-700 text-xs"
-                >
-                  Xóa
                 </button>
               </td>
             </tr>
