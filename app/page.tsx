@@ -17,7 +17,10 @@ export default function Page() {
 
   async function load() {
     setLoading(true);
-    const [cRes, bRes] = await Promise.all([fetch('/api/clients'), fetch('/api/bus')]);
+    const [cRes, bRes] = await Promise.all([
+      fetch('/api/clients', { cache: 'no-store' }),
+      fetch('/api/bus', { cache: 'no-store' }),
+    ]);
     const cData = await cRes.json();
     const bData = await bRes.json();
     setClients(cData.clients || []);
