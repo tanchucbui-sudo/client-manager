@@ -24,8 +24,14 @@ export default function ClientTable({
     onChanged();
   }
 
-  async function setStatus(clientId: number, trangThai: string) {
-    await fetch(`/api/clients/${clientId}`, {
+  async function setStatus(client: Client, trangThai: string) {
+    if (trangThai === client.trang_thai) return;
+    const label = trangThai === 'Active' ? 'Active' : 'Disable';
+    const confirmed = confirm(
+      `Chuyển trạng thái của "${client.ten_khach_hang}" sang ${label}?`
+    );
+    if (!confirmed) return;
+    await fetch(`/api/clients/${client.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ trang_thai: trangThai }),
@@ -58,7 +64,7 @@ export default function ClientTable({
                       : 'bg-slate-200 text-slate-600 border-slate-300'
                   }`}
                   value={c.trang_thai}
-                  onChange={(e) => setStatus(c.id, e.target.value)}
+                  onChange={(e) => setStatus(c, e.target.value)}
                 >
                   <option value="Active">Active</option>
                   <option value="Disable">Disable</option>
