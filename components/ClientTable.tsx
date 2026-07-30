@@ -1,6 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import type { Bu, Client } from '@/lib/db';
+import EditClientModal from '@/components/EditClientModal';
 
 export default function ClientTable({
   clients,
@@ -11,6 +13,8 @@ export default function ClientTable({
   bus: Bu[];
   onChanged: () => void;
 }) {
+  const [editing, setEditing] = useState<Client | null>(null);
+
   async function assignBu(clientId: number, buId: string) {
     await fetch(`/api/clients/${clientId}`, {
       method: 'PATCH',
@@ -80,7 +84,13 @@ export default function ClientTable({
                   ))}
                 </select>
               </td>
-              <td className="px-4 py-2 text-right">
+              <td className="px-4 py-2 text-right whitespace-nowrap">
+                <button
+                  onClick={() => setEditing(c)}
+                  className="text-slate-600 hover:text-slate-900 text-xs mr-3"
+                >
+                  Sửa
+                </button>
                 <button
                   onClick={() => removeClient(c.id)}
                   className="text-red-500 hover:text-red-700 text-xs"
@@ -99,6 +109,22 @@ export default function ClientTable({
           )}
         </tbody>
       </table>
+
+      {editing && (
+        <EditClientModal
+          client={editing}
+          bus={bus}
+          onClose={() => setEditing(null)}
+          onSaved={() => {
+            setEditing(null);
+            onChanged();
+          }}
+          onDeleted={() => {
+            setEditing(null);
+            onChanged();
+          }}
+        />
+      )}
     </div>
   );
 }
